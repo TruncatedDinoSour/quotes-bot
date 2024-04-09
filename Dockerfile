@@ -1,11 +1,10 @@
 FROM node:20-slim
 
-WORKDIR /usr/src/app
+COPY package*.json /tmp/
+RUN cd /tmp && npm install
+RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app/
 
-COPY . .
+WORKDIR /opt/app
+COPY . /opt/app
 
-ENV NODE_ENV=production
-
-RUN npm install
-
-CMD [ "npm", "run", "bot" ]
+CMD ["npm", "run", "bot"]
