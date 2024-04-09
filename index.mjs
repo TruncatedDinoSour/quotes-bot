@@ -14,14 +14,14 @@ let user_id;
 const client = new MatrixClient(config.homeserver, config.token);
 
 function get_command_argument(event) {
-    return event["content"]["body"].split(" ").slice(1).join(" ");
+    return event["content"]["body"].split(" ").slice(1).join(" ").trim();
 }
 
 async function cmd_quote(room_id, event) {
     let caption = get_command_argument(event).substring(0, 128);
 
     if (!caption) {
-        client.replyText(
+        await client.replyText(
             room_id,
             event,
             `Usage: !quote <caption> - takes the replied to image and uploads it to ${config.imag}`,
@@ -62,16 +62,16 @@ async function cmd_quote(room_id, event) {
                     `Failed to POST the image. Response code: ${r.status}`,
                 );
 
-            axios.get(`${config.imag}/api/count`).then((r) => {
-                client.replyText(
+            axios.get(`${config.imag}/api/count`).then(async (r) => {
+                await client.replyText(
                     room_id,
                     event,
                     `Quote #${r.data} posted! Check it out at ${config.imag}#${r.data} or ${config.imag}image/${r.data} :)`,
                 );
             });
         })
-        .catch((e) => {
-            client.replyText(room_id, event, `${e}`);
+        .catch(async (e) => {
+            await client.replyText(room_id, event, "Error!");
             console.error(e);
         });
 }
@@ -81,7 +81,7 @@ async function cmd_get(room_id, event) {
     let image_url;
 
     if (!q) {
-        client.replyText(
+        await client.replyText(
             room_id,
             event,
             "Usage: !get <quote ID> OR (newest:)(n (result number, starting from 1):)<query> - gets a quote by its ID, or searches for it applying score or newest posted filters, also allows you to set which result to get",
@@ -123,7 +123,7 @@ async function cmd_get(room_id, event) {
         });
     } catch (e) {
         console.error(e);
-        client.replyText(room_id, event, "Failed to fetch the quote.");
+        await client.replyText(room_id, event, "Failed to fetch the quote.");
         return;
     }
 
@@ -155,14 +155,14 @@ async function cmd_get(room_id, event) {
         type: mime,
     });
 
-    client.sendMessage(room_id, content);
+    await client.sendMessage(room_id, content);
 }
 
 async function cmd_join(room_id, event) {
     let room = get_command_argument(event);
 
     if (!room) {
-        client.replyText(
+        await client.replyText(
             room_id,
             event,
             "Usage: !join <room ID or alias> - join a room",
@@ -170,7 +170,13 @@ async function cmd_join(room_id, event) {
         return;
     }
 
-    client.joinRoom(room);
+    await client.joinRoom(room).catch(async () => {
+        await client.replyText(
+            room_id,
+            event,
+            "Failed to join the room. Invalid room ID?",
+        );
+    });
 }
 
 async function on_room_message(room_id, event) {
@@ -233,7 +239,7 @@ function main() {
             await on_room_message(room_id, event);
         } catch (e) {
             console.error(e);
-            client.replyText(room_id, event, `Error! ${e}`);
+            client.replyText(room_id, event, "Error!");
         }
     });
 
