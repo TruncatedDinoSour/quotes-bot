@@ -9,6 +9,7 @@ import {
 import FormData from "form-data";
 import axios from "axios";
 import sizeOf from "image-size";
+import escapeHtml from "escape-html";
 
 let user_id;
 const client = new MatrixClient(config.homeserver, config.token);
@@ -83,7 +84,7 @@ async function cmd_quote(room_id, event) {
 
 async function cmd_get(room_id, event) {
     let q = get_command_argument(event);
-    let image_url;
+    let image_url, image_id;
 
     if (!q) {
         await client.replyText(
@@ -95,7 +96,8 @@ async function cmd_get(room_id, event) {
     }
 
     if (q.match(/^\d+$/)) {
-        image_url = `${config.imag}image/${q}`;
+        image_id = q;
+        image_url = `${config.imag}image/${image_id}`;
     } else {
         let newest = q.startsWith("newest:");
 
@@ -112,15 +114,17 @@ async function cmd_get(room_id, event) {
         let results = await axios.get(
             `${config.imag}api/search?q=${encodeURIComponent(q)}&s=${newest ? "newest" : "score"}`,
         );
+
         if (results.status >= 400 || results.data.length < n) {
             client.replyText(room_id, event, "No such quotes found.");
             return;
         }
 
-        image_url = `${config.imag}image/${results.data[Math.max(n - 1, 0)].iid}`;
+        image_id = Math.max(n - 1, 0);
+        image_url = `${config.imag}image/${results.data[image_id].iid}`;
     }
 
-    let image;
+    let image, metadata;
 
     try {
         image = await axios.get(image_url, {
@@ -132,6 +136,19 @@ async function cmd_get(room_id, event) {
         return;
     }
 
+    try {
+        metadata = (await axios.get(`${config.imag}api/image/${image_id}`))
+            .data;
+    } catch (e) {
+        console.error(e);
+        await client.replyText(
+            room_id,
+            event,
+            "Failed to fetch the quote metadata.",
+        );
+        return;
+    }
+
     let buffer = Buffer.from(image.data);
 
     let dimensions = sizeOf(buffer);
@@ -139,7 +156,7 @@ async function cmd_get(room_id, event) {
     let ext = mime === "image/png" ? "png" : "jpg";
 
     let content = {
-        body: `quote.${ext}`,
+        body: `quote-${image_id}.${ext}`,
         info: {
             size: image.data.byteLength,
             w: dimensions.width,
@@ -160,7 +177,19 @@ async function cmd_get(room_id, event) {
         type: mime,
     });
 
-    await client.sendMessage(room_id, content);
+    let image_msg = await client.getEvent(
+        room_id,
+        await client.sendMessage(room_id, content),
+    );
+
+    await client.replyHtmlText(
+        room_id,
+        image_msg,
+        `Quote ${metadata.iid}: "${escapeHtml(metadata.desc)}" | ${metadata.score} ${metadata.score < 0 ? "\uD83D\uDC4E" : "\uD83D\uDC4D"}
+<br/>
+<br/>
+Created: ${new Date(metadata.created * 1000).toUTCString()} | Edited: ${new Date(metadata.edited * 1000).toUTCString()}`,
+    );
 }
 
 async function cmd_join(room_id, event) {
