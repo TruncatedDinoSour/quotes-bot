@@ -206,7 +206,7 @@ async function cmd_get(room_id, event) {
     if (metadata)
         await client.sendHtmlText(
             room_id,
-            `Quote <a href="${config.imag}#${image_id}">${metadata.iid}</a>: "${escapeHtml(metadata.desc)}"
+            `<a href="${config.imag}#${image_id}">Quote ${metadata.iid}</a>: "${escapeHtml(metadata.desc)}"
 <br/>
 Score: ${metadata.score} ${metadata.score < 0 ? "\uD83D\uDC4E" : "\uD83D\uDC4D"}
 <br/>
