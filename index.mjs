@@ -208,7 +208,8 @@ async function cmd_get(room_id, event) {
             room_id,
             `Quote ${metadata.iid}: "${escapeHtml(metadata.desc)}" | ${metadata.score} ${metadata.score < 0 ? "\uD83D\uDC4E" : "\uD83D\uDC4D"}
 
-Created: ${new Date(metadata.created * 1000).toUTCString()} | Edited: ${new Date(metadata.edited * 1000).toUTCString()}`,
+Created: ${new Date(metadata.created * 1000).toUTCString()}
+Edited: ${new Date(metadata.edited * 1000).toUTCString()}`,
         );
 }
 
