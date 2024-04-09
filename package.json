@@ -1,0 +1,33 @@
+{
+    "name": "quotes-bot",
+    "version": "1.0.0",
+    "description": "A matrix bot integrating with the Imag image board.",
+    "main": "index.mjs",
+    "scripts": {
+        "bot": "node index.mjs"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://ari.lt/gh/quotes-bot"
+    },
+    "keywords": [
+        "matrix",
+        "quotes",
+        "imag",
+        "matrix",
+        "quotes"
+    ],
+    "author": "Ari Archer",
+    "license": "AGPL-3.0-or-later",
+    "devDependencies": {
+        "@eslint/js": "^9.0.0",
+        "eslint": "^9.0.0",
+        "globals": "^15.0.0"
+    },
+    "dependencies": {
+        "axios": "^1.6.8",
+        "form-data": "^4.0.0",
+        "image-size": "^1.1.1",
+        "matrix-bot-sdk": "^0.7.1"
+    }
+}
