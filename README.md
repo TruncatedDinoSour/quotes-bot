@@ -9,5 +9,6 @@ See `config.example.mjs` to configure it.
 ```sh
 cp config.example.mjs config.mjs
 vim config.mjs  # Configure it
+docker compose build --no-cache
 docker compose up -d
 ```
