@@ -14,7 +14,12 @@ let user_id;
 const client = new MatrixClient(config.homeserver, config.token);
 
 function get_command_argument(event) {
-    return event["content"]["body"].slice(config.prefix.length);
+    return event["content"]["body"]
+        .slice(config.prefix.length)
+        .split(" ")
+        .slice(1)
+        .join(" ")
+        .trim();
 }
 
 async function cmd_quote(room_id, event) {
