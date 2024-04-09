@@ -177,17 +177,26 @@ async function cmd_get(room_id, event) {
         type: mime,
     });
 
-    let image_msg_id = await client.sendMessage(room_id, content);
-    let image_msg = await client.getEvent(room_id, image_msg_id);
+    try {
+        let iid = await client.sendMessage(room_id, content);
+        let eid = await client.getEvent(room_id, iid);
 
-    await client.replyHtmlText(
-        room_id,
-        image_msg,
-        `Quote ${metadata.iid}: "${escapeHtml(metadata.desc)}" | ${metadata.score} ${metadata.score < 0 ? "\uD83D\uDC4E" : "\uD83D\uDC4D"}
-<br/>
-<br/>
+        await client.replyHtmlText(
+            room_id,
+            eid,
+            `Quote ${metadata.iid}: "${escapeHtml(metadata.desc)}" | ${metadata.score} ${metadata.score < 0 ? "\uD83D\uDC4E" : "\uD83D\uDC4D"}
+
 Created: ${new Date(metadata.created * 1000).toUTCString()} | Edited: ${new Date(metadata.edited * 1000).toUTCString()}`,
-    );
+        );
+    } catch (e) {
+        console.error(e);
+
+        await client.replyText(
+            room_id,
+            event,
+            "Failed to construct the image metadata message",
+        );
+    }
 }
 
 async function cmd_join(room_id, event) {
