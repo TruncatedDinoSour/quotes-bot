@@ -207,11 +207,11 @@ async function cmd_get(room_id, event) {
         await client.sendHtmlText(
             room_id,
             `Quote <a href="${config.imag}#${image_id}">${metadata.iid}</a>: "${escapeHtml(metadata.desc)}"
-\n
+<br/>
 Score: ${metadata.score} ${metadata.score < 0 ? "\uD83D\uDC4E" : "\uD83D\uDC4D"}
-\n
+<br/>
 Created: ${new Date(metadata.created * 1000).toUTCString()}
-\n
+<br/>
 Edited: ${new Date(metadata.edited * 1000).toUTCString()}`,
         );
 }
