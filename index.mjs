@@ -177,10 +177,8 @@ async function cmd_get(room_id, event) {
         type: mime,
     });
 
-    let image_msg = await client.getEvent(
-        room_id,
-        await client.sendMessage(room_id, content),
-    );
+    let image_msg_id = await client.sendMessage(room_id, content);
+    let image_msg = await client.getEvent(room_id, image_msg_id);
 
     await client.replyHtmlText(
         room_id,
