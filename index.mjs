@@ -132,8 +132,8 @@ async function cmd_get(room_id, event) {
             return;
         }
 
-        image_id = n;
-        image_url = `${config.imag}image/${results.data[Math.max(n - 1, 0)].iid}`;
+        image_id = results.data[Math.max(n - 1, 0)].iid;
+        image_url = `${config.imag}image/${image_id}`;
     }
 
     dlog("Image ID:", image_id);
