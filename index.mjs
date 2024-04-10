@@ -261,6 +261,48 @@ async function cmd_leave(room_id, event) {
     await cmd_join(room_id, event, "leave", "Left");
 }
 
+async function cmd_score(room_id, event) {
+    let n = 10,
+        ns = get_command_argument(event);
+
+    if (ns && ns.match(/^-?\d+$/)) n = parseInt(ns);
+
+    if (n === 0) {
+        client.replyText(room_id, event, "Usage: score <positive or negative number>");
+        return;
+    }
+
+    let all;
+
+    try {
+        all = (await axios.get(`${config.imag}api/all`)).data;
+    } catch (e) {
+        console.error(e);
+        await client.replyText(room_id, event, "Failed to fetch all quotes.");
+    }
+
+    let qs;
+
+    if (n > 0) qs = all.slice(0, n);
+    else if (n < 0) qs = all.slice(n);
+
+    if (qs.length == 1) {
+        event["content"]["body"] = `${config.prefix}get ${qs[0].iid}`;
+        return await cmd_get(room_id, event);
+    }
+
+    let html = "<ul>";
+
+    for (let idx = 0; idx < qs.length; ++idx) {
+        let q = qs[idx];
+        html += `<li><a href="${config.imag}#${q.iid}">Quote #${q.iid}</a> - "${escapeHtml(q.desc)}": ${q.score} ${q.score < 0 ? "\uD83D\uDC4E" : "\uD83D\uDC4D"}</li>`;
+    }
+
+    html += "</ul>";
+
+    await client.replyHtmlText(room_id, event, html);
+}
+
 async function on_room_message(room_id, event) {
     // debug stuff
 
@@ -327,21 +369,28 @@ async function on_room_message(room_id, event) {
             .toLowerCase()
             .startsWith(`${config.prefix}help`)
     )
-        await client.replyText(
+        await client.replyHtmlText(
             room_id,
             event,
             `
-Available commands:
-
-- quote
-- get
-- source
-- join (admin only)
-- leave (admin only)
-- die (admin only)
-- help
+Available commands:<br/>
+<br/>
+- quote <caption> - post a quote to ${config.imag}<br/>
+- get <ID or (newest:)(Nth:)query> - get a quote<br/>
+- source - get the source code of the bot<br/>
+- join <room id> - join a room (admin only)<br/>
+- leave <room id> - leave a room (admin only)<br/>
+- die - make the bot shut down (admin only)<br/>
+- help - print help<br/>
+- score <negative or positive number = 10> - get the quotes with lowest or highest scores
 `.trim(),
         );
+    else if (
+        event["content"]["body"]
+            .toLowerCase()
+            .startsWith(`${config.prefix}score`)
+    )
+        await cmd_score(room_id, event);
 }
 
 async function main() {
@@ -351,6 +400,11 @@ async function main() {
         );
 
     client.addPreprocessor(new RichRepliesPreprocessor(false));
+
+    if (config.debug) {
+        config.prefix = `${Math.random()}:${config.prefix}`;
+        dlog(`Debug prefix: ${config.prefix}`);
+    }
 
     if (config.autojoin) {
         dlog("Enabling autojoin");
