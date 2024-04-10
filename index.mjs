@@ -78,7 +78,7 @@ async function cmd_quote(room_id, event) {
                     `Failed to POST the image. Response code: ${r.status}`,
                 );
 
-            axios.get(`${config.imag}/api/count`).then(async (r) => {
+            axios.get(`${config.imag}/api/latest`).then(async (r) => {
                 await client.replyText(
                     room_id,
                     event,
