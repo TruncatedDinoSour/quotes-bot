@@ -206,13 +206,16 @@ async function cmd_get(room_id, event) {
     if (metadata)
         await client.sendHtmlText(
             room_id,
-            `<a href="${config.imag}#${image_id}">Quote ${metadata.iid}</a>: "${escapeHtml(metadata.desc)}"
-<br/>
-Score: ${metadata.score} ${metadata.score < 0 ? "\uD83D\uDC4E" : "\uD83D\uDC4D"}
-<br/>
-Created: ${new Date(metadata.created * 1000).toUTCString()}
-<br/>
-Edited: ${new Date(metadata.edited * 1000).toUTCString()}`,
+        `<a href="${config.imag}#${image_id}">Quote ${metadata.iid}</a>: "${escapeHtml(metadata.desc)}"
+<hr/>
+<ul>
+<li>Score: ${metadata.score} ${metadata.score < 0 ? "\uD83D\uDC4E" : "\uD83D\uDC4D"}</li>
+<li>Created: ${new Date(metadata.created * 1000).toUTCString()}</li>
+<li>Edited: ${new Date(metadata.edited * 1000).toUTCString()}</li>
+</ul>
+<blockquote>
+${escapeHtml(metadata.ocr)}
+<blockquote>`,
         );
 }
 
