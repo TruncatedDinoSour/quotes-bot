@@ -213,9 +213,7 @@ async function cmd_get(room_id, event) {
 <li>Created: ${new Date(metadata.created * 1000).toUTCString()}</li>
 <li>Edited: ${new Date(metadata.edited * 1000).toUTCString()}</li>
 </ul>
-<blockquote>
-${escapeHtml(metadata.ocr)}
-<blockquote>`,
+<blockquote>${escapeHtml(metadata.ocr)}<blockquote>`,
         );
 }
 
