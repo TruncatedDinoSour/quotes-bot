@@ -206,14 +206,14 @@ async function cmd_get(room_id, event) {
     if (metadata)
         await client.sendHtmlText(
             room_id,
-        `<a href="${config.imag}#${image_id}">Quote ${metadata.iid}</a>: "${escapeHtml(metadata.desc)}"
+            `<a href="${config.imag}#${image_id}">Quote ${metadata.iid}</a>: "${escapeHtml(metadata.desc)}"
 <hr/>
 <ul>
 <li>Score: ${metadata.score} ${metadata.score < 0 ? "\uD83D\uDC4E" : "\uD83D\uDC4D"}</li>
 <li>Created: ${new Date(metadata.created * 1000).toUTCString()}</li>
 <li>Edited: ${new Date(metadata.edited * 1000).toUTCString()}</li>
 </ul>
-<blockquote>${escapeHtml(metadata.ocr)}<blockquote>`,
+<blockquote>${escapeHtml(metadata.ocr).replaceAll("\n", "<br/>")}<blockquote>`,
         );
 }
 
@@ -269,7 +269,11 @@ async function cmd_score(room_id, event) {
     if (ns && ns.match(/^-?\d+$/)) n = parseInt(ns);
 
     if (n === 0) {
-        client.replyText(room_id, event, "Usage: score <positive or negative number>");
+        client.replyText(
+            room_id,
+            event,
+            "Usage: score <positive or negative number>",
+        );
         return;
     }
 
