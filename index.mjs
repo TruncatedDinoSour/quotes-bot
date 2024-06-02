@@ -396,6 +396,14 @@ Available commands:<br/>
             .startsWith(`${config.prefix}score`)
     )
         await cmd_score(room_id, event);
+    else if (
+        event["content"]["body"].toLowerCase().startsWith(`${config.prefix}add`)
+    )
+        await client.replyText(
+            room_id,
+            event,
+            "look at this idiot lmfaoo \uD83D\uDC80",
+        );
 }
 
 async function main() {
