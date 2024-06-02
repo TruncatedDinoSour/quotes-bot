@@ -402,7 +402,7 @@ Available commands:<br/>
         await client.replyText(
             room_id,
             event,
-            "look at this idiot lmfaoo \uD83D\uDC80",
+            "look at this idiot lmfaoo",
         );
 }
 
