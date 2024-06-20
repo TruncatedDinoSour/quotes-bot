@@ -1,3 +1,4 @@
+# This repository has been migrated to the self-hosted ari-web Forgejo instance: <https://git.ari.lt/ari/quotes-bot>
 # Quotes bot
 
 A quotes bot integrating with [Imag](https://ari.lt/gh/imag) !
